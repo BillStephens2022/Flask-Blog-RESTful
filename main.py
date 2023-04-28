@@ -84,9 +84,11 @@ def add_new_post():
     return render_template("make-post.html", form=form)
 
 
-@app.route("/edit-post", methods=["GET", "POST"])
-def edit_post():
-    pass
+@app.route("/edit-post/<int:post_id>", methods=["GET", "POST"])
+def edit_post(post_id):
+    post = BlogPost.query.get(post_id)
+    edit_form = CreatePostForm()
+    return render_template("make-post.html", form=edit_form, is_edit=True)
 
 
 if __name__ == "__main__":
