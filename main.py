@@ -94,23 +94,19 @@ def login():
         email = form.email.data
         password = form.password.data
 
-    user = User.query.filter_by(email=email).first()
+        user = User.query.filter_by(email=email).first()
 
-    #  if email doesn't exist, display error message and redirect back to login
-    if not user:
-        flash("That email doesn't exist, please try again.")
-        return redirect(url_for('login'))
-    # if password incorrect, display error message and redirect to login
-    elif not check_password_hash(user.password, password):
-        flash("Password incorrect, please try again")
-        return redirect(url_for('login'))
-    else:
-        login_user(user)
-        return redirect(url_for('get_all_posts'))
-
-    if user and check_password_hash(user.password, password):
-        login_user(user)
-        return redirect(url_for('get_all_posts'))
+        #  if email doesn't exist, display error message and redirect back to login
+        if not user:
+            flash("That email doesn't exist, please try again.")
+            return redirect(url_for('login'))
+        # if password incorrect, display error message and redirect to login
+        elif not check_password_hash(user.password, password):
+            flash("Password incorrect, please try again")
+            return redirect(url_for('login'))
+        else:
+            login_user(user)
+            return redirect(url_for('get_all_posts'))
 
     return render_template("login.html", form=form)
 
