@@ -15,13 +15,13 @@ app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
 ckeditor = CKEditor(app)
 Bootstrap(app)
 
-##CONNECT TO DB
+# CONNECT TO DB
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 
-##CONFIGURE TABLES
+# CONFIGURE TABLES
 
 class User(UserMixin, db.Model):
     __tablename__ = "users"
@@ -29,12 +29,17 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(100))
     name = db.Column(db.String(100))
+    # this will act as a list of BlogPost objects attached to each User.
+    # The "author" refers to the author property in the BlogPost class.
+    posts = relationship("BlogPost", back_populates="author")
 
 
 class BlogPost(db.Model):
     __tablename__ = "blog_posts"
     id = db.Column(db.Integer, primary_key=True)
-    author = db.Column(db.String(250), nullable=False)
+    # create Foreign Key, "users.id" refers to the tablename of User.
+    author_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    author = relationship("User", back_populates="posts")
     title = db.Column(db.String(250), unique=True, nullable=False)
     subtitle = db.Column(db.String(250), nullable=False)
     date = db.Column(db.String(250), nullable=False)
@@ -43,6 +48,7 @@ class BlogPost(db.Model):
 
 
 db.create_all()
+
 
 # Create admin-only decorator
 def admin_only(f):
@@ -54,6 +60,7 @@ def admin_only(f):
         # Otherwise continue with the route function
         return f(*args, **kwargs)
     return decorated_function
+
 
 @app.route('/')
 def get_all_posts():
@@ -78,7 +85,7 @@ def register():
         new_user = User(
             email=form.email.data,
             name=form.name.data,
-            password = hash_and_salted_password,
+            password=hash_and_salted_password,
         )
         db.session.add(new_user)
         db.session.commit()
@@ -107,11 +114,11 @@ def login():
 
         user = User.query.filter_by(email=email).first()
 
-        #  if email doesn't exist, display error message and redirect back to login
+        #  if email doesn't exist, display error message and redirect back to log in
         if not user:
             flash("That email doesn't exist, please try again.")
             return redirect(url_for('login'))
-        # if password incorrect, display error message and redirect to login
+        # if password incorrect, display error message and redirect to log in
         elif not check_password_hash(user.password, password):
             flash("Password incorrect, please try again")
             return redirect(url_for('login'))
@@ -144,7 +151,7 @@ def contact():
     return render_template("contact.html")
 
 
-@app.route("/new-post")
+@app.route("/new-post", methods=["GET", "POST"])
 # use customized  admin-only decorator function defined above
 @admin_only
 def add_new_post():
@@ -164,7 +171,7 @@ def add_new_post():
     return render_template("make-post.html", form=form)
 
 
-@app.route("/edit-post/<int:post_id>")
+@app.route("/edit-post/<int:post_id>", methods=["GET", "POST"])
 # use customized  admin-only decorator function defined above
 @admin_only
 def edit_post(post_id):
