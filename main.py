@@ -48,6 +48,7 @@ class BlogPost(db.Model):
     date = db.Column(db.String(250), nullable=False)
     body = db.Column(db.Text, nullable=False)
     img_url = db.Column(db.String(250), nullable=False)
+    comments = relationship("Comment", back_populates="parent_post")
 
 
 class Comment(db.Model):
@@ -58,6 +59,9 @@ class Comment(db.Model):
     # "comments" refers to the comments property in the User class.
     author_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     comment_author = relationship("User", back_populates="comments")
+    post_id = db.Column(db.Integer, db.ForeignKey("blog_posts.id"))
+    parent_post = relationship("BlogPost", back_populates="comments")
+    text = db.Column(db.Text, nullable=False)
 
 
 db.create_all()
