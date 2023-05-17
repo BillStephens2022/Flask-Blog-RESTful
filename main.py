@@ -32,6 +32,9 @@ class User(UserMixin, db.Model):
     # this will act as a list of BlogPost objects attached to each User.
     # The "author" refers to the author property in the BlogPost class.
     posts = relationship("BlogPost", back_populates="author")
+    # this will act as a list of Comment objects attached to each User.
+    # the "comment_author" refers to the author property in the Comment class.
+    comments = relationship("Comment", back_populates="comment_author")
 
 
 class BlogPost(db.Model):
@@ -51,6 +54,10 @@ class Comment(db.Model):
     __tablename__ = "comments"
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.Text, nullable=False)
+    # create Foreign Key, "user.id" refers to the tablename of User
+    # "comments" refers to the comments property in the User class.
+    author_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    comment_author = relationship("User", back_populates="comments")
 
 
 db.create_all()
