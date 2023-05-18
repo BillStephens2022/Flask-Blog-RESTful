@@ -2,7 +2,7 @@
 
   ## Description
 
-  This is a full stack Blog application built using the Python Flask framework, SQLite, SQLAlchemy, WTForms, and Flask 
+  This is a full stack Blog application built using the Python Flask framework, Jinja templating, SQLite, SQLAlchemy, WTForms, and Flask 
   Login for user authentication.
 
 Screenshots below:
